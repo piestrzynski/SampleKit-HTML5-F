@@ -1,0 +1,465 @@
+/////////////////////////////////////////////////
+//  										   \\
+//	****************************************   \\
+//	**  Własna Biblioteka Mixin i Funkcji **   \\
+//  ****************************************   \\	
+//	Autor: Dominik Piestrzyński 			   \\
+//	Uniwersytet Pedagogiczny                   \\
+//	im. KEN w Krakowie						   \\
+//										       \\
+//											   \\
+////////////////////////////////////////////////
+/*
+
+23 mixiny, 1 funkcja.
+
+
+*/
+
+//-------------------------------------
+//KONFIGURACJA 
+$noPrefixes: false; // false - ustawia prefixy, true  kasuje prefixy
+
+//-------------------------------------
+//!!!!PRZETESTOWAĆ!!!!!!!
+@mixin prefix($property, $value, $prefixes) {
+
+    $noPrefixes: false !default;
+    $prefixes: if($noPrefixes, false, $prefixes);
+
+    @if $prefixes {
+        @each $prefix in $prefixes {
+            -#{$prefix}-#{$property}: $value;
+        }
+    }
+
+}
+
+//-----------------------------------  FUNCTION LAYOUT -------------------------------\\
+
+@function u($nazwa){
+
+	$imgPath: "../gfx/" !default;   // ścieżka do katalogu z obrazkami
+
+	@return  url(#{$imgPath}#{$nazwa});
+}
+
+
+
+@function dziel($liczba1, $liczba2){
+
+	$wynik: ($liczba1/$liczba2);
+
+	@return  round($wynik);
+}
+
+
+//-----------------------------------  MIXINS LAYOUT ---------------------------------\\
+
+
+/// BLOKOWE WYRÓWNANIE DO JEDNEJ LINI []
+@mixin inline-block{
+	display:inline-block; 
+	*display: inline; // dla IE
+ 	zoom: 1; // dla IE
+}
+///////////////////////////////////////
+
+
+
+/// PRZEŹROCZYSTOŚĆ  [*wartosc%] (wartość w procentach)
+@mixin opacity($opacity){   
+	opacity: $opacity/100; 
+	filter: alpha(opacity=$opacity);  // dla IE
+
+}
+//////////////////////////////////////
+
+
+/// Generowanie naglowkow  [*rozmiarFontu]
+
+@mixin headings($fontSize){
+
+	@for $i from 1 through 6 
+	{
+		h#{$i}
+		{ 
+			font-size: $fontSize + 2 - (2 * $i); 
+		}
+	}	
+}
+
+//////////////////////////////////////
+
+
+
+///  Naglowek jako logo  [*urlObrazka, *szerokoscObrazka, *wysokoscObrazka]
+@mixin heading-logo($logo, $width, $height){
+	
+	background: url($logo) no-repeat;
+    display: block;
+    height: $height;
+    text-indent: -999em;
+    width: $width;
+	
+	float: left;
+	
+}
+//////////////////////////////////////
+
+
+
+/// Generowanie naglowkow  [krójpisma, rozmiar, kolor]
+
+@mixin font($family, $size, $color){
+	font:{                
+		size: $size;
+		family: $family;
+
+		}
+		color: $color;
+}
+//////////////////////////////////////
+
+
+/// DODAWANIE NIESTANDARDOWEGO FONTU [*nazwa, *ścieżka]
+// wymagane pliki eot, woff, ttf, svg
+
+@mixin font-face($name, $fontPath){
+	@font-face {
+    font-family: '#{$name}';
+    src: url('#{$fontPath}.eot');
+    src: url('#{$fontPath}.eot?#iefix') format('embedded-opentype'),
+         url('#{$fontPath}.woff') format('woff'),
+         url('#{$fontPath}.ttf') format('truetype'),
+         url('#{$fontPath}.svg') format('svg');
+    font-weight: normal;
+    font-style: normal;
+	}
+}
+
+//////////////////////////////////////
+
+
+
+
+/// Wyśrodkowanie strony  [*szerokoscStrony]
+
+@mixin wrapper($width:980px){
+		width: $width;
+		margin: 0 auto;
+	}
+
+
+//////////////////////////////////////
+
+
+
+/// EFEKT PRZEJŚCIA  [dotyczy,czas,rodzaj]
+@mixin transition($props: all, $speed: 1s, $easing: linear){
+		
+		-webkit-transition: $props $speed $easing;
+		-moz-transition: $props $speed $easing;
+		-o-transition: $props $speed $easing;
+		-ms-transition: $props $speed $easing;
+		transition: $props $speed $easing;	
+}
+
+
+//////////////////////////////////////
+
+/*
+	@include prefix(transition, $props $speed $easing, moz webkit o ms);
+	transition: $props $speed $easing; */
+
+/// KOLOROWANIE TABELI na zebra-style [*kolor]
+
+
+@mixin zebra-style($color){
+	tr:nth-child(odd){background-color: $color}
+	tr:nth-child(even){background-color: darken($color, 20%);} // Funkcje kolorów
+}
+
+//////////////////////////////////////
+
+
+/// ZAOKRĄGLENIE [zaokraglenie, grubosc, kolor, typ]
+@mixin border-radius($radius: 5px, $border: 0, $color: #000, $type: solid)
+{
+
+	border-radius:$radius;
+	@if $border > 0 {border: $border $color $type;}
+	@else {border: none;} 
+}
+//////////////////////////////////////
+
+
+/// AKAPIT [*kolor, line-height]
+@mixin akapit($color, $lh:1.4em){
+    color: $color;
+    line-height: $lh;  
+}
+//////////////////////////////////////
+
+
+/// BOX-AKAPIT-WYRÓŻNIAJĄCY [ *szerokość-obrazka, *obrazek, *szerokość-boxu, *wysokość-boxu, *koloTła, kolorTekstu]   
+// (120px x 120px zalecany obrazek, kontener div)
+
+@mixin spec-box-text($width-img, $img, $width, $height, $bColor, $color: darken($bColor,45)){
+	margin: 10px;
+	display: block;
+	background: url($img) no-repeat 0 50% $bColor;
+	border: 1px solid darken($bColor, 10);
+	padding: 10px;
+	width: $width;
+	height: $height;
+	
+	p { 
+		padding: 10px 10px 10px $width-img;
+		
+		color: $color;
+		text-align: center;
+	}
+}
+//////////////////////////////////////
+
+
+/// KOLOR ZAZNACZENIA WSZYSTKIEGO [*kolor-tekstu, kolor-tla, *nazwa elementu]
+
+@mixin selection($color, $bgcolor: inver($color), $elem: "")
+{
+
+	#{$elem}::selection
+		{
+		color: $color;
+		background-color: $bgcolor;
+		}
+
+	#{$elem}::-webkit-selection
+		{
+		color: $color;
+		background-color: $bgcolor;
+		}
+	#{$elem}::-moz-selection
+		{
+		color: $color;
+		background-color: $bgcolor;
+		}		
+}
+
+
+///////////////////////////////////////////////////////////
+
+
+/// LINKI  [*kolor, kolorNajechania, Podkreslenie:False]
+@mixin linki($color, $underline: False, $hcolor: invert($color))
+{
+	a:link {
+	margin:10px;
+    color: $color;
+    text-decoration: none;
+	}
+	a:visited {
+	    color: $color;
+	    text-decoration: none;
+	}
+	a:hover, a:active, a:focus {
+	    color: $hcolor;
+	    @if $underline == True {text-decoration: underline;}
+	    @else {text-decoration: none;}
+	   
+	}
+}
+///////////////////////////////////////////////////////////
+
+
+
+/// LINKI SPECJALNE [*obrazek-sciezka, *szerokosc, *wysokosc]
+
+@mixin spec-link($img, $width, $height)
+{
+	background: url($img) no-repeat scroll 1% 55%;
+    margin: 10px 5px;
+    padding-left:$width;
+    padding-top: $height;
+    padding-bottom: $height;
+}
+
+
+///////////////////////////////////////////////////////////
+
+
+
+/// CIEŃ DLA ELEMENTÓW [...]
+@mixin box-shadow($shadows...) {
+    @include prefix(box-shadow, $shadows, webkit moz);
+    box-shadow: $shadows;
+}
+///////////////////////////////////////////////////////////
+
+
+
+/// CIEŃ DLA TEKSTU [*kolor, x,y,radius,invert(true/false)]
+@mixin text-shadow($color, $x: 1px, $y: 1px, $radius: 0, $invert: false) {
+
+    @if $invert {
+        $x: $x * (-1);
+        $y: $y * (-1);
+    }
+
+    text-shadow: $x $y $radius $color;
+}
+///////////////////////////////////////////////////////////
+
+
+
+/// LISTA Z OBRAZKIEM  [*urlObrazka, *szerokoscObrazka, Line-Height,]
+
+@mixin list-point($img, $width, $line:1.3em) {
+   	
+   	li {
+   		list-style: none;
+		background: url($img) no-repeat scroll 1% 70%;
+	    
+	    line-height:$line;
+	    padding: 2px 0 2px $width;
+	}
+}
+
+///////////////////////////////////////////////////////////
+
+
+///  LISTA Z RÓŻNYMI OBRAZKAMI [*lista-nazw]
+//  nazwa.png
+@mixin list($list){
+	@each $Item in $list {
+
+	li.#{$Item} {background: url("../gfx/#{$Item}.png") no-repeat;}
+	}
+}
+///////////////////////////////////////////////////////////
+
+
+
+
+
+/// PRZYCISK Z CIENIEM 1 - deklaracje dla klasy [*kolor, Zaokraglenie:False]
+@mixin button($color, $radius:False) {
+    $bsColor: null;
+    $tsColor: null;
+    $tColor: null;
+
+    @if lightness($color) > 50% {
+        $bsColor: darken($color, 15%);
+        $tsColor: darken($color, 35%);
+        $tColor: lighten($color, 10%);
+    } @else {
+        $bsColor: lighten($color, 10%);
+        $tsColor: darken($color, 35%);
+        $tColor: lighten($color, 60%);
+    }
+
+    @include inline-block;
+    margin: 5px;
+    padding: 10px 20px;
+    position: relative;
+    @if $radius == True { @include border-radius(8px); }
+    @include box-shadow(0px 2px 0px $bsColor, 0px 2px 5px rgba(0, 0, 0, .7));
+    @include transition($speed: 0.1s);
+    @include text-shadow($tsColor, $invert: true);
+    background-color: $color;
+    color: $tColor;
+    text-decoration: none;
+	text-align: center;
+    &:active {
+        @include box-shadow(0px 3px 0px $bsColor, 0px 3px 6px rgba(0, 0, 0, .9));
+
+        top: 2px;
+    }
+}
+///////////////////////////////////////////
+
+
+
+/// GOTOWA PROSTA NAWIGACJA  [*kolorTla, szerokosc] 
+@mixin nav($bColor, $width: 100%){
+	
+	width: $width;
+	border: 1px solid $bColor;
+    background: $bColor;
+    margin-bottom: 10px;
+	ul {
+	    margin: 0;
+	    padding: 12px 0px;
+	}
+	 ul li {
+	    display: inline;
+	    list-style: outside none none;
+	}
+	ul li a {
+	    color: invert($bColor);
+	    padding: 9px 25px;
+	    text-decoration: none;
+	}
+	 ul li a:hover {
+	 	@include transition($speed: 0.4s);
+	    background: none repeat scroll 0 0 lighten($bColor, 70);
+	    color: $bColor;
+	}
+
+}
+//////////////////////////////////////
+
+
+
+/// DYMKI CSS elementu span [*kolorTekstu, kolor podkreslenia ]
+@mixin dymki-css($bgcolor, $colorTekstu, $colorlini: #000) {
+	 span[data-comment] {
+	  border-bottom: dotted 1px $colorlini;
+	  //color: $colorTekstu;
+	  position: relative;
+	}
+
+	 span[data-comment]:after {
+	  content: attr(data-comment);
+	  display: none;
+	  position: absolute;
+	  padding: 2px 5px;
+	  background: $bgcolor;
+	  
+	  color:$colorTekstu;
+	}
+
+	 span[data-comment]:hover:after {
+	  display: block;
+	  padding:10px 10px;
+	  min-width: 250px;
+	  
+	}
+}
+///////////////////////////////////////////
+
+
+
+/// ANIMACJA z użyciem @content [*nazwa] !!!!PRZETESTOWAĆ!!!!!!!
+@mixin animacja($nazwa){
+
+@-webkit-keyframes $nazwa
+     { @content; }
+
+@-moz-keyframes $nazwa
+     { @content; }
+
+@-o-keyframes $nazwa
+     { @content; }
+
+@-ms-keyframes $nazwa
+     { @content; }
+
+@keyframes $nazwa
+     { @content; }
+
+}
+//////////////////////////////////////
+
+

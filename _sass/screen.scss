@@ -1,0 +1,48 @@
+@charset "utf-8";
+/*-----------------------------*/
+/*        COPYRIGHT 2014       */
+/*      DOMINIK PIESTRZYNSKI   */
+/*-----------------------------*/
+@import  "reset";
+@import "biblioteka-sass";
+@import "compass";  
+@import "sassy-buttons";
+
+
+
+
+// *--------- VAR ---------*
+$legacy-support-for-ie: true;
+$experimental-support-for-webkit: true;
+$experimental-support-for-mozilla: true;
+$experimental-support-for-opera: true;
+$experimental-support-for-microsoft: true;
+$experimental-support-for-khtml: true;
+
+
+// *--------- TYPOGRAFIA ---------*
+
+
+// *---------  LAYOUT ---------*
+body {
+    font-family: "Tahoma";
+    font-size: 0.75em;
+	background: #fff;
+}
+
+a.button1 { @include sassy-button("matte", 5px, 16px, #434343)}
+
+
+
+
+
+
+
+
+
+/*-----------------------------*/
+/*        COPYRIGHT 2014      */
+/*      www.twojastrona.pl     */
+/*-----------------------------*/
+
+
